@@ -1,5 +1,6 @@
 import scipy
 import numpy as np
+import re
 
 def cast_list_as_strings(mylist):
     """
@@ -53,3 +54,44 @@ def print_mistake_k(k, train_df, mistake_indices, predictions):
     print(train_df.iloc[mistake_indices[k]].question2)
     print("true class:", train_df.iloc[mistake_indices[k]].is_duplicate)
     print("prediction:", predictions[mistake_indices[k]])
+    
+    
+def lower_list(mylist):
+    list_lowered = []
+    for string in mylist:
+        list_lowered.append(string.lower())
+    return list_lowered
+
+def remove_sw(mylist,stop_words):
+    list_without_sw = []
+    for string in mylist:
+        # Regular expression pattern to match stop words
+        pattern = re.compile(r'\b(' + '|'.join(stop_words) + r')\b', re.IGNORECASE)
+        # Remove the stop words using the regular expression pattern
+        list_without_sw.append(pattern.sub('',string))
+    return list_without_sw
+    
+def tokenize(mylist):
+    list_tokenized = []
+    for string in mylist:
+        # Regular expression pattern to match words
+        pattern = re.compile(r"\w+")
+        tokens = pattern.findall(string)
+        list_tokenized.append(tokens)
+    return list_tokenized
+
+
+def jaccard_similarity(sent1,sent2):
+    return len(sent1.intersection(sent2)) / len(sent1.union(sent2))
+    
+def jaccard_distance(sent1,sent2):
+    return 1-jaccard_similarity(sent1,sent2)
+
+def generate_jd_feature(q1_tokens,q2_tokens):
+    jd_feature = []
+    for i in range(len(q1_tokens)):
+        jd = jaccard_distance(set(q1_tokens[i]),set(q2_tokens[i]))
+        jd_feature.append(jd)
+    return jd_feature
+        
+        
