@@ -1,6 +1,7 @@
 import scipy
 import numpy as np
 import re
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def cast_list_as_strings(mylist):
     """
@@ -93,5 +94,15 @@ def generate_jd_feature(q1_tokens,q2_tokens):
         jd = jaccard_distance(set(q1_tokens[i]),set(q2_tokens[i]))
         jd_feature.append(jd)
     return jd_feature
-        
-        
+
+def tfidf_vectorizer(
+        document: list[str], 
+        vectorizer:TfidfVectorizer) -> np.array:
+    return vectorizer.fit_transform(document).idf_
+
+def cosine_distance(
+        vector1: np.array, 
+        vector2: np.array) -> float:
+    return np.dot(
+        vector1.T/np.linalg.norm(vector1),
+        vector2.T/np.linalg.norm(vector2))
