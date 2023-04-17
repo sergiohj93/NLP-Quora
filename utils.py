@@ -96,13 +96,13 @@ def generate_jd_feature(q1_tokens,q2_tokens):
     return jd_feature
 
 def tfidf_vectorizer(
-        document: list[str], 
-        vectorizer:TfidfVectorizer) -> np.array:
-    return vectorizer.fit_transform(document).idf_
+        corpus: list[str]) -> np.array:
+    vectorizer = TfidfVectorizer()
+    return vectorizer.fit_transform(corpus)
 
 def cosine_distance(
         vector1: np.array, 
         vector2: np.array) -> float:
     return np.dot(
         vector1.T/np.linalg.norm(vector1),
-        vector2.T/np.linalg.norm(vector2))
+        vector2.T/np.linalg.norm(vector2))      
