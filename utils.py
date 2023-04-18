@@ -99,8 +99,10 @@ def generate_jd_feature(q1_tokens,q2_tokens):
     return jd_feature
         
 def tfidf_vectorizer(
-        corpus: list[str]) -> np.array:
-    vectorizer = TfidfVectorizer()
+        corpus: list[str],
+        max_features=1000) -> np.array:
+    vectorizer = TfidfVectorizer(
+        max_features=max_features)
     return vectorizer.fit_transform(corpus)
 
 def cosine_distance(
