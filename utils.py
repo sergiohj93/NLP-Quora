@@ -1,3 +1,5 @@
+import pytest
+
 import scipy
 import numpy as np
 import re
@@ -139,7 +141,6 @@ def negation(sent1, sent2, nlp):
 def build_w2v_model(
         doc:list[str],
         n_fueatures:int,
-        n_epochs:int,
         seed:int = 1,
         sg:int = 0,
         context_size:int = 5,
@@ -150,7 +151,7 @@ def build_w2v_model(
     return w2v.Word2Vec(
         sentences=doc,
         sg=sg,
-        seed=1,
+        seed=seed,
         workers = num_workers,
         vector_size = n_fueatures,
         min_count = min_word_count,
