@@ -1,5 +1,3 @@
-import pytest
-
 import scipy
 import numpy as np
 import re
@@ -70,7 +68,7 @@ def lower_list(mylist):
 def remove_sw(mylist,stop_words):
     list_without_sw = []
     for string in mylist:
-        # Regular expression pattern to match stop words
+        # Pattern to match stop words
         pattern = re.compile(r'\b(' + '|'.join(stop_words) + r')\b', re.IGNORECASE)
         # Remove the stop words using the regular expression pattern
         list_without_sw.append(pattern.sub('',string))
@@ -82,9 +80,10 @@ def tokenize(mylist):
         # Regular expression pattern to match words
         pattern = re.compile(r"\w+")
         tokens = pattern.findall(string)
+        if len(tokens)==0:
+            tokens=[""]
         list_tokenized.append(tokens)
     return list_tokenized
-
 
 def jaccard_similarity(sent1,sent2):
     return len(sent1.intersection(sent2)) / len(sent1.union(sent2))
@@ -98,7 +97,7 @@ def generate_jd_feature(q1_tokens,q2_tokens):
         jd = jaccard_distance(set(q1_tokens[i]),set(q2_tokens[i]))
         jd_feature.append(jd)
     return jd_feature
-
+        
 def tfidf_vectorizer(
         corpus: list[str]) -> np.array:
     vectorizer = TfidfVectorizer()
@@ -109,7 +108,7 @@ def cosine_distance(
         vector2: np.array) -> float:
     return np.dot(
         vector1.T/np.linalg.norm(vector1),
-        vector2.T/np.linalg.norm(vector2))    
+        vector2.T/np.linalg.norm(vector2))            
 
 def same_word(token1, token2):
     if token1 == token2:
@@ -136,8 +135,7 @@ def negation(sent1, sent2, nlp):
         return 1
     else:
         return 0
-        #vector2.T/np.linalg.norm(vector2))
-
+    
 def build_w2v_model(
         doc:list[str],
         n_fueatures:int,
