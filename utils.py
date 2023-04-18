@@ -2,6 +2,8 @@ import scipy
 import numpy as np
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
+import gensim.models.word2vec as w2v
+import multiprocessing
 
 def cast_list_as_strings(mylist):
     """
@@ -132,3 +134,43 @@ def negation(sent1, sent2, nlp):
         return 1
     else:
         return 0
+        #vector2.T/np.linalg.norm(vector2))
+
+def build_w2v_model(
+        doc:list[str],
+        n_fueatures:int,
+        n_epochs:int,
+        seed:int = 1,
+        sg:int = 0,
+        context_size:int = 5,
+        down_sampling:int = 1e-3,
+        min_word_count:int = 0) -> w2v:
+    num_workers = multiprocessing.cpu_count()
+
+    return w2v.Word2Vec(
+        sentences=doc,
+        sg=sg,
+        seed=1,
+        workers = num_workers,
+        vector_size = n_fueatures,
+        min_count = min_word_count,
+        window = context_size,
+        sample = down_sampling
+    )
+
+def w2v_embedding(
+        n_features:int,
+        n_epochs: int,
+        doc: list[str], 
+        word2vec: w2v = None) -> np.array:
+    
+    tokens = tokenize(doc)
+    word2vec = build_w2v_model(tokens, n_features, n_epochs)
+    
+    word_vectors = []
+
+    for token in tokens[0]:
+        
+        word_vectors.append(word2vec.wv.get_vector(token))
+
+    return np.mean(word_vectors, axis=0)
