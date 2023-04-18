@@ -105,4 +105,30 @@ def cosine_distance(
         vector2: np.array) -> float:
     return np.dot(
         vector1.T/np.linalg.norm(vector1),
-        vector2.T/np.linalg.norm(vector2))      
+        vector2.T/np.linalg.norm(vector2))    
+
+def same_word(token1, token2):
+    if token1 == token2:
+        return 1
+    
+    return 0
+
+# No sé si es muy útil (con checkear la primera palabra y el average word embedding creo que es mejor).
+def same_words_ordered(q1_tokens,q2_tokens):
+    n = min(len(q1_tokens), len(q2_tokens))
+    same = 0
+    for i in range(n):
+        same += same_word(q1_tokens[i], q2_tokens[i])
+
+    return same / n
+
+# Requiere del modelo nlp = spacy.load('en_core_web_sm') que cargo en el notebook. Este feature no da muy buenos resultados de todas formas.
+def negation(sent1, sent2, nlp):
+    doc1 = nlp(sent1)
+    doc2 = nlp(sent2)
+
+    # Check if the negation is the same
+    if (not any(token.dep_ == 'neg' for token in doc1)) == (not any(token.dep_ == 'neg' for token in doc2)):
+        return 1
+    else:
+        return 0
