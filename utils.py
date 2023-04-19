@@ -5,7 +5,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import gensim.models.word2vec as w2v
 import multiprocessing
 import spacy
-from tqdm import tqdm
 
 def cast_list_as_strings(mylist):
     """
@@ -67,6 +66,7 @@ def lower_list(mylist):
         list_lowered.append(string.lower())
     return list_lowered
 
+
 def remove_sw(mylist,stop_words):
     list_without_sw = []
     for string in mylist:
@@ -75,6 +75,7 @@ def remove_sw(mylist,stop_words):
         # Remove the stop words using the regular expression pattern
         list_without_sw.append(pattern.sub('',string))
     return list_without_sw
+
     
 def tokenize(mylist):
     list_tokenized = []
@@ -87,11 +88,14 @@ def tokenize(mylist):
         list_tokenized.append(tokens)
     return list_tokenized
 
+
 def jaccard_similarity(sent1,sent2):
     return len(sent1.intersection(sent2)) / len(sent1.union(sent2))
+
     
 def jaccard_distance(sent1,sent2):
     return 1-jaccard_similarity(sent1,sent2)
+
 
 def generate_jd_feature(q1_tokens,q2_tokens):
     jd_feature = []
@@ -99,6 +103,7 @@ def generate_jd_feature(q1_tokens,q2_tokens):
         jd = jaccard_distance(set(q1_tokens[i]),set(q2_tokens[i]))
         jd_feature.append(jd)
     return jd_feature
+
         
 def tfidf_vectorizer(
         corpus: list[str],
@@ -107,32 +112,21 @@ def tfidf_vectorizer(
         max_features=max_features)
     return vectorizer.fit(corpus)
 
+
 def cosine_distance(
         vector1: np.array, 
         vector2: np.array) -> float:
     return np.dot(
         vector1.T/np.linalg.norm(vector1),
-        vector2.T/np.linalg.norm(vector2))            
+        vector2.T/np.linalg.norm(vector2)) 
+          
 
-def same_word(token1, token2):
-    if token1 == token2:
-        return 1
-    
-    return 0
-
-def generate_first_word_feature(q1_tokens, q2_tokens):
-    fw_feature = []
-    for i in range(len(q1_tokens)):
-        fw = same_word(q1_tokens[i][0],q2_tokens[i][0])
-        fw_feature.append(fw)
-    return fw_feature
-
-# No sé si es muy útil (con checkear la primera palabra y el average word embedding creo que es mejor).
 def same_words_ordered(q1_tokens,q2_tokens):
     n = min(len(q1_tokens), len(q2_tokens))
     same = 0
     for i in range(n):
-        same += same_word(q1_tokens[i], q2_tokens[i])
+        if q1_tokens[i] == q2_tokens[i]:
+            same += 1
 
     return same / n
 
@@ -142,6 +136,37 @@ def generate_ordered_words_feature(q1_tokens,q2_tokens):
         ow = same_words_ordered(q1_tokens[i],q2_tokens[i])
         ow_feature.append(ow)
     return ow_feature
+
+
+def search_key_word(q_tokens):
+    for token in q_tokens:
+        if token in ['where', 'when', 'who', 'do', 'should']:
+            return token
+        elif token in ['can', 'how', 'could']:
+            return 'can'
+        elif token in ['what', 'which']:
+            return 'what'
+        elif token in ['why', 'whey']:
+            return 'why'
+        else: return None
+
+
+def compare_key_word(q1_tokens, q2_tokens):
+    key_word1 = search_key_word(q1_tokens)
+    key_word2 = search_key_word(q2_tokens)
+    if key_word1 and key_word1 == key_word2:
+        return 1
+    else:
+        return 0
+    
+
+def generate_key_words_feature(q1_tokens, q2_tokens):
+    kw_feature = []
+    for i in range(len(q1_tokens)):
+        kw = compare_key_word(q1_tokens[i],q2_tokens[i])
+        kw_feature.append(kw)
+    return kw_feature
+
 
 def negation(sent1, sent2, nlp):
     doc1 = nlp(sent1)
