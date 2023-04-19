@@ -4,6 +4,8 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 import gensim.models.word2vec as w2v
 import multiprocessing
+import spacy
+from tqdm import tqdm
 
 def cast_list_as_strings(mylist):
     """
@@ -118,6 +120,13 @@ def same_word(token1, token2):
     
     return 0
 
+def generate_first_word_feature(q1_tokens, q2_tokens):
+    fw_feature = []
+    for i in range(len(q1_tokens)):
+        fw = same_word(q1_tokens[i][0],q2_tokens[i][0])
+        fw_feature.append(fw)
+    return fw_feature
+
 # No sé si es muy útil (con checkear la primera palabra y el average word embedding creo que es mejor).
 def same_words_ordered(q1_tokens,q2_tokens):
     n = min(len(q1_tokens), len(q2_tokens))
@@ -127,7 +136,13 @@ def same_words_ordered(q1_tokens,q2_tokens):
 
     return same / n
 
-# Requiere del modelo nlp = spacy.load('en_core_web_sm') que cargo en el notebook. Este feature no da muy buenos resultados de todas formas.
+def generate_ordered_words_feature(q1_tokens,q2_tokens):
+    ow_feature = []
+    for i in range(len(q1_tokens)):
+        ow = same_words_ordered(q1_tokens[i],q2_tokens[i])
+        ow_feature.append(ow)
+    return ow_feature
+
 def negation(sent1, sent2, nlp):
     doc1 = nlp(sent1)
     doc2 = nlp(sent2)
@@ -137,6 +152,15 @@ def negation(sent1, sent2, nlp):
         return 1
     else:
         return 0
+    
+def generate_negation_feature(q1, q2):
+    nlp = spacy.load('en_core_web_sm')
+
+    negation_feature = []
+    for i in tqdm(range(len(q1))):
+        neg = negation(q1[i],q2[i],nlp)
+        negation_feature.append(neg)
+    return negation_feature
     
 def build_w2v_model(
         doc:list[str],
