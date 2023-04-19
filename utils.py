@@ -100,10 +100,10 @@ def generate_jd_feature(q1_tokens,q2_tokens):
         
 def tfidf_vectorizer(
         corpus: list[str],
-        max_features=1000) -> np.array:
+        max_features=1000) -> TfidfVectorizer:
     vectorizer = TfidfVectorizer(
         max_features=max_features)
-    return vectorizer.fit_transform(corpus)
+    return vectorizer.fit(corpus)
 
 def cosine_distance(
         vector1: np.array, 
@@ -160,18 +160,12 @@ def build_w2v_model(
     )
 
 def w2v_embedding(
-        n_features:int,
-        n_epochs: int,
-        doc: list[str], 
-        word2vec: w2v = None) -> np.array:
-    
-    tokens = tokenize(doc)
-    word2vec = build_w2v_model(tokens, n_features, n_epochs)
+        tokens: list[list[str]], 
+        word2vec: w2v) -> np.array:
     
     word_vectors = []
-
-    for token in tokens[0]:
-        
-        word_vectors.append(word2vec.wv.get_vector(token))
+    for sentence in tokens:
+        for token in sentence:
+            word_vectors.append(word2vec.wv.get_vector(token))
 
     return np.mean(word_vectors, axis=0)
