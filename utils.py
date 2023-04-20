@@ -6,6 +6,7 @@ import os
 import numpy as np
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn import metrics
 import gensim.models.word2vec as w2v
 import tqdm
 import spacy
@@ -198,7 +199,7 @@ def generate_negation_feature(q1, q2):
     
 def build_w2v_model(
         tokens:list[list[str]],
-        n_fueatures:int,
+        n_features:int,
         seed:int = 1,
         workers = 1,
         sg:int = 0,
@@ -211,7 +212,7 @@ def build_w2v_model(
         sg=sg,
         seed=seed,
         workers = workers,
-        vector_size = n_fueatures,
+        vector_size = n_features,
         min_count = min_word_count,
         window = context_size,
         sample = down_sampling
@@ -219,17 +220,25 @@ def build_w2v_model(
 
 def w2v_embedding(
         tokens: list[list[str]], 
-        word2vec: w2v) -> np.ndarray:
+        wv: w2v.wv) -> np.ndarray:
     
     sentence_vectors = []
     for sentence in tokens:
         word_vectors = []
         for token in sentence:
-            word_vectors.append(word2vec.wv.get_vector(token))
+            word_vectors.append(wv.get_vector(token))
         sentence_vectors.append(list(np.mean(word_vectors, axis=0)))
 
     return np.array(sentence_vectors)
 
+def calculate_metrics(y,X,model):
+    model_metrics = []
+    model_metrics.append(metrics.roc_auc_score(y,model.predict(X)))
+    model_metrics.append(metrics.accuracy_score(y,model.predict(X)))
+    model_metrics.append(metrics.precision_score(y,model.predict(X)))
+    model_metrics.append(metrics.recall_score(y,model.predict(X)))
+    model_metrics.append(metrics.f1_score(y,model.predict(X)))
+    return model_metrics
 
 def save_model(model, filename):
     if not os.path.exists('model_artifacts'):
