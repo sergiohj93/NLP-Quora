@@ -1,9 +1,13 @@
+from __future__ import annotations
 import scipy
+import pickle
+import errno
+import os
 import numpy as np
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 import gensim.models.word2vec as w2v
-import multiprocessing
+import tqdm
 import spacy
 
 def cast_list_as_strings(mylist):
@@ -114,11 +118,16 @@ def tfidf_vectorizer(
 
 
 def cosine_distance(
-        vector1: np.array, 
-        vector2: np.array) -> float:
-    return np.dot(
-        vector1.T/np.linalg.norm(vector1),
-        vector2.T/np.linalg.norm(vector2)) 
+        vector1: scipy.sparse.csr.csr_matrix | np.ndarray, 
+        vector2: scipy.sparse.csr.csr_matrix | np.ndarray) -> float:
+    if isinstance(vector1, scipy.sparse.csr.csr_matrix):
+        return np.dot(
+            vector1.T.toarray()[0]/np.linalg.norm(vector1.toarray()),
+            vector2.T.toarray()[0]/np.linalg.norm(vector2.toarray()))
+    else:
+        return np.dot(
+            vector1/np.linalg.norm(vector1),
+            vector2/np.linalg.norm(vector2))
           
 
 def same_words_ordered(q1_tokens,q2_tokens):
@@ -188,20 +197,20 @@ def generate_negation_feature(q1, q2):
     return negation_feature
     
 def build_w2v_model(
-        doc:list[str],
+        tokens:list[list[str]],
         n_fueatures:int,
         seed:int = 1,
+        workers = 1,
         sg:int = 0,
         context_size:int = 5,
         down_sampling:int = 1e-3,
         min_word_count:int = 0) -> w2v:
-    num_workers = multiprocessing.cpu_count()
 
     return w2v.Word2Vec(
-        sentences=doc,
+        sentences=tokens,
         sg=sg,
         seed=seed,
-        workers = num_workers,
+        workers = workers,
         vector_size = n_fueatures,
         min_count = min_word_count,
         window = context_size,
@@ -210,11 +219,34 @@ def build_w2v_model(
 
 def w2v_embedding(
         tokens: list[list[str]], 
-        word2vec: w2v) -> np.array:
+        word2vec: w2v) -> np.ndarray:
     
-    word_vectors = []
+    sentence_vectors = []
     for sentence in tokens:
+        word_vectors = []
         for token in sentence:
             word_vectors.append(word2vec.wv.get_vector(token))
+        sentence_vectors.append(list(np.mean(word_vectors, axis=0)))
 
-    return np.mean(word_vectors, axis=0)
+    return np.array(sentence_vectors)
+
+
+def save_model(model, filename):
+    if not os.path.exists('model_artifacts'):
+        try:
+            # create folder
+            os.makedirs('model_artifacts')
+            # open file descriptors for writing
+            file_path = open(f'model_artifacts/{filename}.pkl', 'wb')
+            pickle.dump(model, file_path)
+            # close file descriptors
+            file_path.close()
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+    else:
+        # open file descriptors for writing
+        file_path = open(f'model_artifacts/{filename}.pkl', 'wb')
+        pickle.dump(model, file_path)
+        # close file descriptors
+        file_path.close()
