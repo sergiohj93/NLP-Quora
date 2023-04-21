@@ -1,5 +1,4 @@
 FROM python:3.9 as build
-FROM jupyter/notebook:latest
 
 WORKDIR /app
 
