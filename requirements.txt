@@ -35,6 +35,7 @@ iniconfig==2.0.0
 ipykernel==6.22.0
 ipython==8.12.0
 ipython-genutils==0.2.0
+ipywidgets==8.0.6
 isoduration==20.11.0
 jedi==0.18.2
 Jinja2==3.1.2
@@ -42,6 +43,8 @@ joblib==1.2.0
 json5==0.9.11
 jsonpointer==2.3
 jsonschema==4.17.3
+jupyter==1.0.0
+jupyter-console==6.6.3
 jupyter-events==0.6.3
 jupyter-ydoc==0.2.4
 jupyter_client==8.2.0
@@ -50,8 +53,8 @@ jupyter_server==2.5.0
 jupyter_server_fileid==0.9.0
 jupyter_server_terminals==0.4.4
 jupyter_server_ydoc==0.8.0
-jupyterlab==3.6.3
 jupyterlab-pygments==0.2.2
+jupyterlab-widgets==3.0.7
 jupyterlab_server==2.22.1
 langcodes==3.3.0
 MarkupSafe==2.1.2
@@ -91,6 +94,8 @@ python-json-logger==2.0.7
 pytz==2023.3
 PyYAML==6.0
 pyzmq==25.0.2
+qtconsole==5.4.2
+QtPy==2.3.1
 requests==2.28.2
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
@@ -124,6 +129,7 @@ wcwidth==0.2.6
 webcolors==1.13
 webencodings==0.5.1
 websocket-client==1.5.1
+widgetsnbextension==4.0.7
 y-py==0.5.9
 ypy-websocket==0.8.2
 zipp==3.15.0
