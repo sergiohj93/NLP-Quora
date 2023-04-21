@@ -1,2 +1,11 @@
-docker build -t nlp_quora:latest -< Dockerfile
-docker run -it -p 8888:8888 -t nlp_quora:latest /bin/bash
+export DOCKER_REPOSITORY='eyuel1'
+export DOCKER_NAME='nlp_quora'
+export DOCKER_TAG='1.0.0'
+
+
+docker build -t ${DOCKER_REPOSITORY}/${DOCKER_NAME}:${DOCKER_TAG} .
+docker tag ${DOCKER_REPOSITORY}/${DOCKER_NAME}:${DOCKER_TAG} ${DOCKER_REPOSITORY}/${DOCKER_NAME}:latest
+docker push ${DOCKER_REPOSITORY}/${DOCKER_NAME}:${DOCKER_TAG}
+docker push ${DOCKER_REPOSITORY}/${DOCKER_NAME}:latest
+
+docker run -it -p 8888:8888 ${DOCKER_REPOSITORY}/${DOCKER_NAME}:${DOCKER_TAG} /bin/bash
