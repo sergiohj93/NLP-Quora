@@ -1,7 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import gensim.models.word2vec as w2v
 import numpy as np
-import npl_quora.utils as utils
+import utils as utils
 
 def test_tfidf_vectorizer():
     # Given
@@ -18,9 +18,6 @@ def test_cosine_distance():
     a = np.array([1, 0, 0])
     b = np.array([0, 1, 0])
     assert utils.cosine_distance(a, b) == 0.0
-
-def test_tokenize():
-    assert utils.tokenize(["Hello, world!"]) == [["Hello", "world"]]
 
 def test_build_w2v_model():
     # Given
@@ -39,12 +36,10 @@ def test_w2v_embedding():
     # Given
     doc = [['this', 'is', 'a', 'test'], ['this', 'is', 'another', 'test']]
     n_features = 10
-    n_epochs = 10
-    model = utils.build_w2v_model(doc, n_features, n_epochs)
-
+    model = utils.build_w2v_model(doc, n_features)
+    wv = model.wv
     # When
-    embedding = utils.w2v_embedding(doc, model)
-
+    embedding = utils.w2v_embedding(doc, wv)
     # Then
     assert isinstance(embedding, np.ndarray)
     assert embedding.shape == (2, n_features)

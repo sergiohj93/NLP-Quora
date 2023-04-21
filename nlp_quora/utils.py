@@ -118,9 +118,9 @@ def tfidf_vectorizer(
 
 
 def cosine_distance(
-        vector1: scipy.sparse.csr.csr_matrix | np.ndarray, 
-        vector2: scipy.sparse.csr.csr_matrix | np.ndarray) -> float:
-    if isinstance(vector1, scipy.sparse.csr.csr_matrix):
+        vector1: scipy.sparse.csr_matrix | np.ndarray, 
+        vector2: scipy.sparse.csr_matrix | np.ndarray) -> float:
+    if isinstance(vector1, scipy.sparse.csr_matrix):
         return np.dot(
             vector1.T.toarray()[0]/np.linalg.norm(vector1.toarray()),
             vector2.T.toarray()[0]/np.linalg.norm(vector2.toarray()))
