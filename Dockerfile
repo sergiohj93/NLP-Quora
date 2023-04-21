@@ -7,6 +7,4 @@ RUN git clone https://github.com/sergiohj93/NLP-Quora.git \
     && cd NLP-Quora \
     && pip install -r requirements.txt
 
-EXPOSE 8888
-
-CMD ["sh", "-c", "jupyter notebook --port=8888 --no-browser"]
+CMD jupyter notebook --no-browser --ip 0.0.0.0 --port 8888
