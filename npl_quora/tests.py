@@ -1,7 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import gensim.models.word2vec as w2v
 import numpy as np
-import utils
+import npl_quora.utils as utils
 
 def test_tfidf_vectorizer():
     # Given
