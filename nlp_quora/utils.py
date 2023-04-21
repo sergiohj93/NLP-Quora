@@ -132,12 +132,13 @@ def cosine_distance(
 
 def same_words_ordered(q1_tokens,q2_tokens):
     n = min(len(q1_tokens), len(q2_tokens))
+    m = max(len(q1_tokens), len(q2_tokens))
     same = 0
     for i in range(n):
         if q1_tokens[i] == q2_tokens[i]:
             same += 1
 
-    return same / n
+    return same / m
 
 def generate_ordered_words_feature(q1_tokens,q2_tokens):
     ow_feature = []
@@ -157,7 +158,8 @@ def search_key_word(q_tokens):
             return 'what'
         elif token in ['why', 'whey']:
             return 'why'
-        else: return None
+        
+    return None
 
 
 def compare_key_word(q1_tokens, q2_tokens):
