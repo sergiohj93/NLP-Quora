@@ -8,4 +8,4 @@ RUN git clone https://github.com/sergiohj93/NLP-Quora.git \
 
 EXPOSE 8888
 
-CMD ["jupyter", "notebook", "--ip=0000"]
+CMD ["sh", "-c", "jupyter notebook --port=8888 --no-browser"]
