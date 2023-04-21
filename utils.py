@@ -8,8 +8,7 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import metrics
 import gensim.models.word2vec as w2v
-import tqdm
-import spacy
+
 
 def cast_list_as_strings(mylist):
     """
@@ -176,26 +175,6 @@ def generate_key_words_feature(q1_tokens, q2_tokens):
         kw = compare_key_word(q1_tokens[i],q2_tokens[i])
         kw_feature.append(kw)
     return kw_feature
-
-
-def negation(sent1, sent2, nlp):
-    doc1 = nlp(sent1)
-    doc2 = nlp(sent2)
-
-    # Check if the negation is the same
-    if (not any(token.dep_ == 'neg' for token in doc1)) == (not any(token.dep_ == 'neg' for token in doc2)):
-        return 1
-    else:
-        return 0
-    
-def generate_negation_feature(q1, q2):
-    nlp = spacy.load('en_core_web_sm')
-
-    negation_feature = []
-    for i in tqdm(range(len(q1))):
-        neg = negation(q1[i],q2[i],nlp)
-        negation_feature.append(neg)
-    return negation_feature
     
 def build_w2v_model(
         tokens:list[list[str]],
@@ -240,22 +219,28 @@ def calculate_metrics(y,X,model):
     model_metrics.append(metrics.f1_score(y,model.predict(X)))
     return model_metrics
 
-def save_model(model, filename):
-    if not os.path.exists('model_artifacts'):
+def save_artifacts(path):
+    # check if directory exists
+    if not os.path.exists(path):
         try:
             # create folder
-            os.makedirs('model_artifacts')
+            os.makedirs(path)
             # open file descriptors for writing
-            file_path = open(f'model_artifacts/{filename}.pkl', 'wb')
-            pickle.dump(model, file_path)
+            countvectorizer_file = open(path + '/count_vectorizer.pkl', 'wb')
+            logistic_file = open(path + '/logistic.pkl', 'wb')
+            tfidf_vectorizer_file = open(path + '/tfidf_vectorizer.pkl', 'wb')
+            wv.save(path + "/wordvectors")
+            logistic_imp_file = open(path + '/logistic_imp.pkl', 'wb')
+            # serialize and write objects to files
+            pickle.dump(count_vectorizer, countvectorizer_file)
+            pickle.dump(logistic, logistic_file)
+            pickle.dump(tfidf_vectorizer, tfidf_vectorizer_file)
+            pickle.dump(logistic_improved, logistic_imp_file)
             # close file descriptors
-            file_path.close()
+            countvectorizer_file.close()
+            logistic_file.close()
+            tfidf_vectorizer_file.close()
+            logistic_imp_file.close()
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-    else:
-        # open file descriptors for writing
-        file_path = open(f'model_artifacts/{filename}.pkl', 'wb')
-        pickle.dump(model, file_path)
-        # close file descriptors
-        file_path.close()
