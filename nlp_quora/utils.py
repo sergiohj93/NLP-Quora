@@ -221,7 +221,7 @@ def calculate_metrics(y,X,model):
     model_metrics.append(metrics.f1_score(y,model.predict(X)))
     return model_metrics
 
-def save_artifacts(path):
+def save_artifacts(path,count_vectorizer,logistic,tfidf_vectorizer,wv,logistic_improved):
     # check if directory exists
     if not os.path.exists(path):
         try:
